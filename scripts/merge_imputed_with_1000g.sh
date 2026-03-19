@@ -10,7 +10,7 @@ set -euo pipefail
 # Run from the project root:
 #   bash scripts/merge_imputed_with_1000g.sh
 
-cd /nfs/users/nfs_g/gk18/prs_application
+cd "$(dirname "$0")/.."
 
 module load cellgen/plink/2.00
 

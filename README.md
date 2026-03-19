@@ -19,11 +19,11 @@ The current working sample is `user123` and the merged reference cohort contains
 
 Important files and directories:
 - `user123.ttam.txt.gz`: raw 23andMe text file
-- `merge_1000g/`: merged reference/imputed cohort files
+- `merge_1kgp/`: merged reference/imputed cohort files
 - `scores/`: raw and converted score files
 - `results/`: PRS outputs, summaries, figures
 - `scripts/make_perturbed_vcf.py`: conversion and perturbation utility
-- `scripts/merge_imputed_with_1000g.sh`: merge helper
+- `scripts/merge_imputed_with_1kgp.sh`: merge helper
 - `scripts/run_pgs_batch.py`: batch PGS fetch/score/QC
 - `scripts/run_single_pgs_report.py`: single-trait wrapper
 - `scripts/plot_prs_histograms.py`: histogram grid plotting
@@ -135,8 +135,8 @@ Notes:
 
 Extract EUR from Phase 3 and normalize IDs.
 
-The final EUR reference dataset used here was:
-- `merge_1000g/1000g_eur.snpidfix.{pgen,pvar.zst,psam}`
+The final EUR reference dataset used here was (not provided):
+- `merge_1kgp/1kgp_eur.snpidfix.{pgen,pvar.zst,psam}`
 
 A critical lesson from this project:
 - variant IDs must be normalized consistently
@@ -150,7 +150,7 @@ PLINK does not support sample-level merging of different datasets, so we convert
 Main helper script:
 
 ```bash
-bash scripts/merge_imputed_with_1000g.sh
+bash scripts/merge_imputed_with_1kgp.sh
 ```
 
 That script does the following:
@@ -160,8 +160,8 @@ That script does the following:
 4. merges samples with `bcftools merge`
 
 Final merged cohort:
-- `merge_1000g/eur_plus_imputed.vcf.gz`
-- `merge_1000g/eur_plus_imputed.vcf.gz.tbi`
+- `merge_1kgp/eur_plus_imputed.vcf.gz`
+- `merge_1kgp/eur_plus_imputed.vcf.gz.tbi`
 
 Sanity checks from this project:
 - samples: `514`
@@ -172,18 +172,18 @@ Convert merged VCF to PLINK2:
 ```bash
 
 plink2 \
-  --vcf merge_1000g/eur_plus_imputed.vcf.gz dosage=DS \
+  --vcf merge_1kgp/eur_plus_imputed.vcf.gz dosage=DS \
   --double-id \
   --set-all-var-ids '@:#:$r:$a' \
   --new-id-max-allele-len 200 missing \
   --make-pgen vzs \
-  --out merge_1000g/eur_plus_imputed
+  --out merge_1kgp/eur_plus_imputed
 ```
 
 Outputs:
-- `merge_1000g/eur_plus_imputed.pgen`
-- `merge_1000g/eur_plus_imputed.pvar.zst`
-- `merge_1000g/eur_plus_imputed.psam`
+- `merge_1kgp/eur_plus_imputed.pgen`
+- `merge_1kgp/eur_plus_imputed.pvar.zst`
+- `merge_1kgp/eur_plus_imputed.psam`
 
 ## 7. Score A Single PGS
 
@@ -194,7 +194,7 @@ Fetch from PGS Catalog by PGS ID:
 ```bash
 python3 scripts/run_single_pgs_report.py \
   --pgs-id PGS002204 \
-  --pfile merge_1000g/eur_plus_imputed \
+  --pfile merge_1kgp/eur_plus_imputed \
   --outdir results/single_pgs/PGS002204
 ```
 
@@ -205,7 +205,7 @@ python3 scripts/run_single_pgs_report.py \
   --score-file /path/to/weights.tsv \
   --trait-name "My trait" \
   --name my_trait \
-  --pfile merge_1000g/eur_plus_imputed \
+  --pfile merge_1kgp/eur_plus_imputed \
   --outdir results/single_pgs/my_trait
 ```
 
@@ -229,7 +229,7 @@ Outputs per run:
 Batch scoring script:
 
 ```bash
-python3 scripts/run_pgs_batch.py --panel config/pgs_panel_broad.tsv
+python3 scripts/run_pgs_batch.py --panel pgs_candidate_pool.tsv
 ```
 
 Important result from this project:
@@ -238,7 +238,7 @@ Important result from this project:
 - the remap-first approach rescued multiple scores and removed a systematic mismatch problem
 
 Current broad summary:
-- `results/plink2_batch/summary_broad.tsv`
+- `results/plink2_batch/summary.tsv`
 
 Columns include:
 - `ORIGINAL_SCORE_VARIANTS`
@@ -252,14 +252,14 @@ Columns include:
 - `OVERALL_CONFIDENCE`
 
 Current broad panel config:
-- `config/pgs_panel_broad.tsv`
+- `pgs_candidate_pool.tsv`
 
 ## 9. Visualization and Interpretation
 
 Make one histogram per trait in a grid:
 
 ```bash
-python3 scripts/plot_prs_histograms.py
+python3 scripts/plot_prs_histograms.py --target-iid user123_user123
 ```
 
 Outputs:

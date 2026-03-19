@@ -14,8 +14,8 @@ import urllib.request
 import matplotlib.pyplot as plt
 
 REST_BASE = "https://www.pgscatalog.org/rest/score/"
-DEFAULT_PROJECT = pathlib.Path("/nfs/users/nfs_g/gk18/prs_application")
-DEFAULT_TARGET_IID = "genome1402_genome1402"
+DEFAULT_PROJECT = pathlib.Path(".").resolve()
+DEFAULT_TARGET_IID = None
 FAKE_RE = re.compile(r"^FAKE_[0-9]+_FAKE_[0-9]+$")
 
 
@@ -302,7 +302,7 @@ def main():
     ap.add_argument('--name', help='Short run name for output prefix. Defaults to PGS ID or score-file stem.')
     ap.add_argument('--pfile', default=str(DEFAULT_PROJECT / 'merge_1000g/eur_plus_imputed'), help='PLINK2 pfile prefix')
     ap.add_argument('--merged-pvar', default=str(DEFAULT_PROJECT / 'merge_1000g/eur_plus_imputed.pvar.zst'), help='Merged pvar.zst path for remapping')
-    ap.add_argument('--target-iid', default=DEFAULT_TARGET_IID)
+    ap.add_argument('--target-iid', required=True, help='IID of the real target sample in the merged pfile.')
     ap.add_argument('--outdir', default=str(DEFAULT_PROJECT / 'results/single_pgs'))
     args = ap.parse_args()
 

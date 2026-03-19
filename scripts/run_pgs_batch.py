@@ -13,14 +13,13 @@ import urllib.request
 from collections import defaultdict
 
 REST_BASE = "https://www.pgscatalog.org/rest/score/"
-PROJECT_ROOT = pathlib.Path("/nfs/users/nfs_g/gk18/prs_application")
+PROJECT_ROOT = pathlib.Path(".").resolve()
 MERGED_PFILE = PROJECT_ROOT / "merge_1000g/eur_plus_imputed"
 MERGED_PVAR = PROJECT_ROOT / "merge_1000g/eur_plus_imputed.pvar.zst"
 RESULTS_DIR = PROJECT_ROOT / "results/plink2_batch"
 SCORES_DIR = PROJECT_ROOT / "scores/batch"
 RAW_DIR = SCORES_DIR / "raw"
 PLINK_DIR = SCORES_DIR / "plink2"
-TARGET_IID = "genome1402_genome1402"
 FAKE_RE = re.compile(r"^FAKE_[0-9]+_FAKE_[0-9]+$")
 
 
@@ -202,13 +201,13 @@ def parse_log(log_path: pathlib.Path):
     return proc, miss
 
 
-def summarize_sscore(path: pathlib.Path):
+def summarize_sscore(path: pathlib.Path, target_iid: str):
     with path.open() as f:
         r = csv.DictReader(f, delimiter="\t")
         rows = list(r)
     score_col = "SCORE1_AVG" if "SCORE1_AVG" in rows[0] else "SCORE1_SUM"
-    refs = [float(r[score_col]) for r in rows if r["IID"] != TARGET_IID and not FAKE_RE.match(r["IID"])]
-    target = next(float(r[score_col]) for r in rows if r["IID"] == TARGET_IID)
+    refs = [float(r[score_col]) for r in rows if r["IID"] != target_iid and not FAKE_RE.match(r["IID"])]
+    target = next(float(r[score_col]) for r in rows if r["IID"] == target_iid)
     fake_vals = [float(r[score_col]) for r in rows if FAKE_RE.match(r["IID"])]
     le = sum(1 for x in refs if x <= target)
     mean = sum(refs) / len(refs)
@@ -267,6 +266,7 @@ def overall_confidence(prep_mode, prepared, processed):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--panel", default=str(PROJECT_ROOT / "config/pgs_panel.tsv"))
+    ap.add_argument("--target-iid", required=True, help="IID of the real target sample in the merged pfile.")
     args = ap.parse_args()
 
     RAW_DIR.mkdir(parents=True, exist_ok=True)
@@ -291,7 +291,7 @@ def main():
             out_prefix = RESULTS_DIR / pgs_id
             plink_score(score_path, out_prefix)
             processed, missing_ids = parse_log(pathlib.Path(f"{out_prefix}.log"))
-            stats = summarize_sscore(pathlib.Path(f"{out_prefix}.sscore"))
+            stats = summarize_sscore(pathlib.Path(f"{out_prefix}.sscore"), args.target_iid)
             summary_rows.append({
                 "PGS_ID": pgs_id,
                 "TRAIT": trait,
