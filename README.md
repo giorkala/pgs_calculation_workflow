@@ -278,9 +278,8 @@ See below for more details on the output.
 ## 10. Future work
 
 Natural future extensions:
-- append single-score runs automatically into a master summary TSV
 - add trait metadata and publication links to summaries
-- add trait-direction interpretation labels where phenotype coding is unambiguous
+- improve variant coverage between the imputed dataset and variants used in each PGS (see below)
 - build an indel-inclusive branch of the merge pipeline for older sparse scores
 
 ## 11. Acknowledgements

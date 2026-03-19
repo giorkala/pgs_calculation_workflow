@@ -7,10 +7,10 @@ import re
 import matplotlib.pyplot as plt
 
 PROJECT = pathlib.Path('.').resolve()
-SUMMARY = PROJECT / 'results/plink2_batch/summary.tsv'
-RESULTS_DIR = PROJECT / 'results/plink2_batch'
-OUT_PNG = PROJECT / 'results/plink2_batch/prs_histograms_grid.png'
-OUT_PDF = PROJECT / 'results/plink2_batch/prs_histograms_grid.pdf'
+SUMMARY = PROJECT / 'results/pgs_pool/summary.tsv'
+RESULTS_DIR = PROJECT / 'results/pgs_pool'
+OUT_PNG = PROJECT / 'results/pgs_pool/prs_histograms_grid.png'
+OUT_PDF = PROJECT / 'results/pgs_pool/prs_histograms_grid.pdf'
 FAKE_RE = re.compile(r'^FAKE_[0-9]+_FAKE_[0-9]+$')
 
 
@@ -88,7 +88,7 @@ def main():
     for ax in axes[n:]:
         ax.axis('off')
 
-    fig.suptitle('PRS Distributions in 1000G EUR with genome1402 highlighted', fontsize=16)
+    fig.suptitle('PRS Distributions in 1000G EUR with user highlighted', fontsize=16)
     fig.savefig(OUT_PNG, dpi=200, bbox_inches='tight')
     fig.savefig(OUT_PDF, bbox_inches='tight')
     print(OUT_PNG)
