@@ -2,13 +2,13 @@
 
 Simple pipeline for calculating polygenic risk scores (PGS; aka PRS) for an individual's genotypes, using variant weights from the PGS Catalog. To provide context, it first merges the user's genotypes with those from the 1000 Genomes Project (1kGP) and calculates PGS for all samples.
 
-It covers:
-- converting raw 23andMe text into a valid VCF using 1kGP Phase 3 alleles
-- creating synthetic copies to satisfy Michigan Imputation Server minimum sample count (also serving as probes for sensitivity analysis), saving to chromosome-based VCFs
-- merging imputed data with 1kGP EUR reference samples
-- fetching or supplying PGS weights
-- scoring PRS against the merged EUR reference cohort
-- generating summary tables and visualizations
+This pipeline may be used to:
+- convert raw 23andMe text into a valid VCF using 1kGP Phase 3 alleles
+- creat synthetic copies to satisfy Michigan Imputation Server minimum sample count (also serving as probes for sensitivity analysis), saving to chromosome-based VCFs
+- merge imputed data with 1kGP EUR reference samples
+- fetch PGS weights from the PGS catalog or use the supplied ones
+- score PGS against the merged EUR reference cohort
+- generate summary tables and visualizations
 
 The current working sample is `user123` and the merged reference cohort contains:
 - `503` 1kGP EUR samples
@@ -45,9 +45,9 @@ The raw 23andMe file looks like:
 
 ```text
 # rsid  chromosome  position  genotype
-rs548049170  1  69869   TT
-rs9326622    1  567092  CC
-rs116587930  1  727841  AG
+rs548049173  1  69869   TT
+rs9326624    1  567092  CC
+rs116587935  1  727841  AG
 ```
 
 Important limitation:
@@ -273,6 +273,22 @@ Figure features:
 - translucent red band for the fake-genotype score range
 - Q1/Q4 title coloring
 
+See below for more details on the output.
+
+## 10. Future work
+
+Natural future extensions:
+- append single-score runs automatically into a master summary TSV
+- add trait metadata and publication links to summaries
+- add trait-direction interpretation labels where phenotype coding is unambiguous
+- build an indel-inclusive branch of the merge pipeline for older sparse scores
+
+## 11. Acknowledgements
+This workflow was developed with help from OpenAI's GPT-5.4 (Codex).
+
+
+## Appendix: details on output and metrics
+
 ### Percentile
 Your percentile is relative to the EUR reference cohort used in this project.
 
@@ -304,7 +320,7 @@ Important:
 - direction must be checked against the underlying phenotype definition
 - sparse scores and scores with lower recovery fractions should be interpreted more cautiously
 
-## 10. Practical Lessons From This Project
+## Practical Lessons From This Project
 
 1. Raw 23andMe data must be anchored to a real variant panel, not just a FASTA.
 2. Michigan input needs valid `REF/ALT`; hom-ref calls are still informative and should not be dropped.
@@ -312,14 +328,3 @@ Important:
 4. For PGS files, remapping by position and effect allele against the final merged cohort is much more reliable than trusting the score file's `other_allele` as `REF`.
 5. Sparse scores can still be useful, but they deserve lower confidence.
 6. Indels were intentionally dropped in the current merged SNP-only pipeline; recovering them would require a more complex branch.
-
-## 11. Future work
-
-Natural future extensions:
-- append single-score runs automatically into a master summary TSV
-- add trait metadata and publication links to summaries
-- add trait-direction interpretation labels where phenotype coding is unambiguous
-- build an indel-inclusive branch of the merge pipeline for older sparse scores
-
-## 12. Acknowledgements
-This workflow was developed with help from OpenAI's GPT-5.4 (Codex).
